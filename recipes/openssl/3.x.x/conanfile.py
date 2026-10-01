@@ -543,7 +543,7 @@ class OpenSSLConan(ConanFile):
             if self._use_nmake:
                 # When `--prefix=/`, the scripts derive `\` without escaping, which
                 # causes issues on Windows
-                replace_in_file(self, "Makefile", "INSTALLTOP_dir=\\", "INSTALLTOP_dir=\\\\")
+                replace_in_file(self, "makefile", "INSTALLTOP_dir=\\", "INSTALLTOP_dir=\\\\")
                 if Version(self.version) >= "3.3.0":
                     # replace backslashes in paths with forward slashes
                     mkinstallvars_pl = os.path.join(self.source_folder, "util", "mkinstallvars.pl")
