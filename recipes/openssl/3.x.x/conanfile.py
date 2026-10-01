@@ -442,6 +442,9 @@ class OpenSSLConan(ConanFile):
         tc = AutotoolsToolchain(self)
         env = tc.environment()
         env.define_path("PERL", self._perl)
+        if self._use_nmake and self.settings_build.os != "Windows" and not tc.ldflags:
+            # Windows drops an empty variable; here an empty LDFLAGS replaces Configure's /debug, so no PDB is linked
+            env.unset("LDFLAGS")
         if self.settings.compiler == "apple-clang":
             xcrun = XCRun(self)
             env.define_path("CROSS_SDK", os.path.basename(xcrun.sdk_path))
