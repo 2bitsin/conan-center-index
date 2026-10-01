@@ -528,7 +528,7 @@ class OpenSSLConan(ConanFile):
 
     @property
     def _perl(self):
-        if self._use_nmake:
+        if self._use_nmake and "strawberryperl" in self.dependencies.build:
             return self.dependencies.build["strawberryperl"].conf_info.get("user.strawberryperl:perl", check_type=str)
         return "perl"
 
