@@ -362,7 +362,9 @@ class OpenSSLConan(ConanFile):
 
     def _adjust_path(self, path):
         if self._use_nmake:
-            return path.replace("\\", "/")
+            path = path.replace("\\", "/")
+            # nmake and link run under wine on a Linux build machine, where the root is drive z:
+            return f"z:{path}" if self.settings_build.os != "Windows" and path.startswith("/") else path
         return unix_path(self, path)
 
     @property
@@ -547,6 +549,10 @@ class OpenSSLConan(ConanFile):
                 # When `--prefix=/`, the scripts derive `\` without escaping, which
                 # causes issues on Windows
                 replace_in_file(self, "makefile", "INSTALLTOP_dir=\\", "INSTALLTOP_dir=\\\\")
+                if self.settings_build.os != "Windows":
+                    # wine 9's cmd runs the right side of || after a link that succeeded
+                    for lib in ("libcrypto", "libssl"):
+                        replace_in_file(self, "makefile", f" || (DEL /Q $(@B).* {lib}.lib & EXIT 1)", "")
                 if Version(self.version) >= "3.3.0":
                     # replace backslashes in paths with forward slashes
                     mkinstallvars_pl = os.path.join(self.source_folder, "util", "mkinstallvars.pl")
